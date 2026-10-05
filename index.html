@@ -22,11 +22,13 @@ h2{font-size:clamp(1.8rem,5vw,2.6rem);text-align:center;margin-bottom:34px;color
 .hero p{color:var(--soft);margin-top:14px;font-size:1.1rem}
 .btn{margin-top:30px;background:var(--accent);color:#fff;border:0;padding:14px 32px;border-radius:50px;font:500 1rem 'Poppins',sans-serif;cursor:pointer;box-shadow:var(--shadow);transition:transform .2s}
 .btn:hover{transform:scale(1.07)}
+.vow{margin-top:18px!important;font-family:'Playfair Display',serif;font-style:italic;font-size:1.25rem!important;color:var(--accent)!important}
+.vow s{opacity:.5}
 .heart{display:inline-block;animation:beat 1.3s infinite}
 @keyframes beat{0%,100%{transform:scale(1)}30%{transform:scale(1.25)}60%{transform:scale(1)}}
-.counter{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:38px;width:100%;max-width:520px}
+.counter{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:38px;width:100%;max-width:600px}
 .counter div{background:var(--card);border-radius:18px;padding:16px 6px;box-shadow:var(--shadow)}
-.counter b{display:block;font-size:1.7rem;color:var(--accent)}
+.counter b{display:block;font-size:1.4rem;color:var(--accent);font-variant-numeric:tabular-nums}
 .counter span{font-size:.75rem;color:var(--soft);text-transform:uppercase;letter-spacing:1px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
 .reason{background:var(--card);border-radius:20px;padding:26px;box-shadow:var(--shadow);cursor:pointer;text-align:center;transition:transform .25s;min-height:130px;display:flex;align-items:center;justify-content:center}
@@ -65,6 +67,7 @@ footer{position:relative;z-index:1;text-align:center;padding:40px 20px;color:var
 .pad{display:grid;grid-template-columns:repeat(3,72px);gap:14px}
 .pad button{height:72px;border-radius:50%;border:0;background:var(--card);color:var(--ink);font:500 1.5rem 'Poppins',sans-serif;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s}
 .pad button:active{transform:scale(.9);background:var(--accent2)}
+#no{transition:left .1s ease-out,top .1s ease-out}
 .shake{animation:shake .4s}
 @keyframes shake{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
 .lockpic{width:130px;height:130px;border-radius:50%;object-fit:cover;border:4px solid var(--accent);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;font-size:3rem;background:var(--card)}
@@ -95,8 +98,10 @@ footer{position:relative;z-index:1;text-align:center;padding:40px 20px;color:var
     <div><b id="h">0</b><span>Hours</span></div>
     <div><b id="m">0</b><span>Mins</span></div>
     <div><b id="s">0</b><span>Secs</span></div>
+    <div><b id="ms">000</b><span>Millis</span></div>
   </div>
   <p style="margin-top:12px;font-size:.9rem">…of loving you, and counting.</p>
+  <p class="vow">Not <s>Tiru</s> — I'm <b>Forever Hiranmai's House Husband</b> 🏠💖</p>
   <button class="btn" onclick="document.getElementById('alone').scrollIntoView()">Scroll down ↓</button>
 </section>
 
@@ -130,7 +135,7 @@ footer{position:relative;z-index:1;text-align:center;padding:40px 20px;color:var
   <p id="answer" style="font-size:1.4rem;color:var(--accent);margin-top:20px"></p>
 </section>
 
-<footer>Made with <span class="heart">♥</span> by <span id="me"></span></footer>
+<footer>Made with <span class="heart">♥</span> by <s>Tiru</s> Forever Hiranmai's House Husband</footer>
 
 <script>
 /* ====== EDIT THIS PART ====== */
@@ -154,7 +159,6 @@ const CONFIG = {
 
 const $ = id => document.getElementById(id);
 $('pname').innerHTML = 'Hiranmai <s style="text-decoration-thickness:4px;opacity:.55">Bodapati</s> Musirana';
-$('me').textContent = CONFIG.myName;
 $('question').textContent = CONFIG.question;
 document.title = "For " + CONFIG.herName + " ♥";
 
@@ -175,13 +179,15 @@ document.title = "For " + CONFIG.herName + " ♥";
 // Counter
 const start = new Date(CONFIG.startDate).getTime();
 function tick(){
-  let t = Math.max(0, Date.now() - start);
+  const t = Math.max(0, Date.now() - start);
   $('d').textContent = Math.floor(t/864e5);
   $('h').textContent = Math.floor(t/36e5)%24;
   $('m').textContent = Math.floor(t/6e4)%60;
   $('s').textContent = Math.floor(t/1e3)%60;
+  $('ms').textContent = String(t%1000).padStart(3,'0');
+  requestAnimationFrame(tick);
 }
-tick(); setInterval(tick,1000);
+tick();
 
 // Timeline
 CONFIG.story.forEach(e=>{
@@ -205,11 +211,15 @@ new IntersectionObserver((es,ob)=>{
 // The question: "No" runs away
 const no=$('no');
 function dodge(){
-  const row=$('row').getBoundingClientRect();
-  no.style.position='relative';
-  no.style.left=(Math.random()*160-80)+'px';
-  no.style.top=(Math.random()*80-40)+'px';
+  no.style.position='fixed'; no.style.zIndex=4;
+  const w=innerWidth-no.offsetWidth-16, h=innerHeight-no.offsetHeight-16;
+  no.style.left=(8+Math.random()*Math.max(0,w))+'px';
+  no.style.top=(8+Math.random()*Math.max(0,h))+'px';
 }
+addEventListener('pointermove',e=>{
+  const r=no.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
+  if(Math.hypot(e.clientX-cx,e.clientY-cy)<130) dodge();
+});
 no.addEventListener('mouseover',dodge);
 no.addEventListener('touchstart',e=>{e.preventDefault();dodge()},{passive:false});
 no.addEventListener('click',dodge);
