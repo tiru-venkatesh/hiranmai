@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>For You ♥</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,500&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff5f7;--card:#ffffff;--ink:#3a2030;--soft:#8a6577;--accent:#e63e6d;--accent2:#ff9bb3;--shadow:0 10px 30px rgba(230,62,109,.15);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a0f16;--card:#2a1822;--ink:#fbe9ef;--soft:#c9a0b2;--shadow:0 10px 30px rgba(0,0,0,.4)}}
+:root[data-theme="dark"]{--bg:#1a0f16;--card:#2a1822;--ink:#fbe9ef;--soft:#c9a0b2;--shadow:0 10px 30px rgba(0,0,0,.4)}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:'Poppins',system-ui,sans-serif;line-height:1.7;overflow-x:hidden}
+canvas{position:fixed;inset:0;pointer-events:none;z-index:0}
+section{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:80px 22px}
+h1,h2{font-family:'Playfair Display',Georgia,serif}
+h2{font-size:clamp(1.8rem,5vw,2.6rem);text-align:center;margin-bottom:34px;color:var(--accent)}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.hero h1{font-size:clamp(2.6rem,9vw,5.5rem);line-height:1.1;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--soft);margin-top:14px;font-size:1.1rem}
+.btn{margin-top:30px;background:var(--accent);color:#fff;border:0;padding:14px 32px;border-radius:50px;font:500 1rem 'Poppins',sans-serif;cursor:pointer;box-shadow:var(--shadow);transition:transform .2s}
+.btn:hover{transform:scale(1.07)}
+.heart{display:inline-block;animation:beat 1.3s infinite}
+@keyframes beat{0%,100%{transform:scale(1)}30%{transform:scale(1.25)}60%{transform:scale(1)}}
+.counter{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:38px;width:100%;max-width:520px}
+.counter div{background:var(--card);border-radius:18px;padding:16px 6px;box-shadow:var(--shadow)}
+.counter b{display:block;font-size:1.7rem;color:var(--accent)}
+.counter span{font-size:.75rem;color:var(--soft);text-transform:uppercase;letter-spacing:1px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.reason{background:var(--card);border-radius:20px;padding:26px;box-shadow:var(--shadow);cursor:pointer;text-align:center;transition:transform .25s;min-height:130px;display:flex;align-items:center;justify-content:center}
+.reason:hover{transform:translateY(-6px) rotate(-1deg)}
+.reason .front{font-size:2rem}
+.reason.open .front{display:none}
+.reason .back{display:none;color:var(--ink)}
+.reason.open .back{display:block}
+.timeline{border-left:3px solid var(--accent2);padding-left:26px;max-width:600px;margin:0 auto}
+.event{position:relative;margin-bottom:34px;opacity:0;transform:translateY(30px);transition:all .7s}
+.event.show{opacity:1;transform:none}
+.event::before{content:'♥';position:absolute;left:-39px;top:0;color:var(--accent);background:var(--bg);font-size:1.1rem}
+.event small{color:var(--accent);font-weight:500}
+.event h3{font-family:'Playfair Display',serif;font-size:1.3rem}
+.event p{color:var(--soft)}
+.letter{background:var(--card);border-radius:24px;padding:36px 28px;box-shadow:var(--shadow);font-family:'Playfair Display',serif;font-style:italic;font-size:1.15rem;min-height:260px;white-space:pre-wrap}
+.ask{text-align:center}
+.ask .row{display:flex;gap:18px;justify-content:center;align-items:center;flex-wrap:wrap;min-height:120px}
+.ask .no{background:var(--card);color:var(--ink);border:2px solid var(--accent2)}
+footer{position:relative;z-index:1;text-align:center;padding:40px 20px;color:var(--soft)}
+.theme{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);right:14px;z-index:5;background:var(--card);border:0;border-radius:50%;width:42px;height:42px;font-size:1.1rem;cursor:pointer;box-shadow:var(--shadow)}
+
+#lock{position:fixed;inset:0;z-index:10;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:20px;text-align:center}
+#lock.open{display:flex}
+#lock .x{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);right:16px;background:none;border:0;font-size:1.8rem;color:var(--ink);cursor:pointer}
+.priv{position:relative;cursor:pointer}
+.priv .ph{filter:saturate(.6)}
+.priv .badge{position:absolute;inset:12px 12px 52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(40,10,25,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:8px;color:#fff;font-size:2.4rem;text-align:center}
+.priv .badge small{font-size:.85rem;font-family:Poppins,sans-serif}
+.priv.open .badge{display:none}
+#lock h2{margin:0;font-size:1.9rem}
+#lock p{color:var(--soft)}
+.dots{display:flex;gap:14px;margin:6px 0}
+.dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--accent);transition:.2s}
+.dots i.on{background:var(--accent)}
+.pad{display:grid;grid-template-columns:repeat(3,72px);gap:14px}
+.pad button{height:72px;border-radius:50%;border:0;background:var(--card);color:var(--ink);font:500 1.5rem 'Poppins',sans-serif;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s}
+.pad button:active{transform:scale(.9);background:var(--accent2)}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+.lockpic{width:130px;height:130px;border-radius:50%;object-fit:cover;border:4px solid var(--accent);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;font-size:3rem;background:var(--card)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px}
+.gallery figure{background:var(--card);padding:12px 12px 18px;border-radius:14px;box-shadow:var(--shadow);transition:transform .3s}
+.gallery figure:nth-child(odd){transform:rotate(-2deg)}.gallery figure:nth-child(even){transform:rotate(2deg)}
+.gallery figure:hover{transform:rotate(0) scale(1.04)}
+.gallery img,.gallery .ph{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:3rem;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff}
+.gallery figcaption{text-align:center;margin-top:10px;font-family:'Playfair Display',serif;font-style:italic;color:var(--soft)}
+</style>
+</head>
+<body>
+<div id="lock">
+  <button class="x" id="close" aria-label="Close">✕</button>
+  <h2>🔒 Private picture</h2>
+  <p id="hint">Enter our secret PIN</p>
+  <div class="dots" id="dots"><i></i><i></i><i></i><i></i></div>
+  <div class="pad" id="pad"></div>
+</div>
+<canvas id="fx"></canvas>
+<button class="theme" id="theme" aria-label="Toggle theme">🌙</button>
+
+<section class="hero">
+  <h1 id="title">Hey, <span id="pname"></span></h1>
+  <p>I made this little corner of the internet just for you <span class="heart">♥</span></p>
+  <div class="counter">
+    <div><b id="d">0</b><span>Days</span></div>
+    <div><b id="h">0</b><span>Hours</span></div>
+    <div><b id="m">0</b><span>Mins</span></div>
+    <div><b id="s">0</b><span>Secs</span></div>
+  </div>
+  <p style="margin-top:12px;font-size:.9rem">…of loving you, and counting.</p>
+  <button class="btn" onclick="document.getElementById('alone').scrollIntoView()">Scroll down ↓</button>
+</section>
+
+<section id="alone" style="text-align:center">
+  <p style="font-size:2.4rem" class="heart">💖</p>
+  <h2 style="max-width:640px;margin:10px auto 0;line-height:1.35">She was the reason I felt I was not alone.</h2>
+</section>
+
+<section>
+  <h2>Us ♥</h2>
+  <div class="gallery" id="gallery"></div>
+</section>
+
+<section>
+  <h2>Our Story</h2>
+  <div class="timeline" id="timeline"></div>
+</section>
+
+<section>
+  <h2>A Letter For You</h2>
+  <div class="letter" id="letter"></div>
+</section>
+
+<section class="ask">
+  <h2>One Question…</h2>
+  <p id="question" style="font-size:1.3rem;margin-bottom:10px"></p>
+  <div class="row" id="row">
+    <button class="btn" id="yes">Yes 💖</button>
+    <button class="btn no" id="no">No</button>
+  </div>
+  <p id="answer" style="font-size:1.4rem;color:var(--accent);margin-top:20px"></p>
+</section>
+
+<footer>Made with <span class="heart">♥</span> by <span id="me"></span></footer>
+
+<script>
+/* ====== EDIT THIS PART ====== */
+const CONFIG = {
+  herName: "Hiranmai",
+  photos: ["1.png","2.png","3.png"], // keep these files next to this html
+  lockPhoto: "4.png", // private picture, shown only after PIN
+  myName: "Me",
+  startDate: "2026-09-11T00:00:00", // the day your story began
+  question: "Will you be mine forever?",
+  yesMessage: "I knew it! I love you so much 💖💖💖",
+  story: [
+    {date:"The Day We Met", title:"Hello, you", text:"I didn't know my life was about to change."},
+    {date:"First Date", title:"Butterflies", text:"Nervous, happy, and totally lost in your eyes."},
+    {date:"Our First 'I Love You'", title:"Three little words", text:"The moment everything became clear."},
+    {date:"Today", title:"Still falling", text:"And every day, I choose you again."}
+  ],
+  letter: "My dearest,\n\nI don't have fancy words, so I built you this instead. Every line of code here is a little piece of how I feel about you.\n\nThank you for your patience, your love, and for being my safe place. Whatever I build in this life, you are the best thing in it.\n\nForever yours."
+};
+/* ============================ */
+
+const $ = id => document.getElementById(id);
+$('pname').innerHTML = 'Hiranmai <s style="text-decoration-thickness:4px;opacity:.55">Bodapati</s> Musirana';
+$('me').textContent = CONFIG.myName;
+$('question').textContent = CONFIG.question;
+document.title = "For " + CONFIG.herName + " ♥";
+
+// Photos
+(function(){
+  const caps=["Us","Always","Forever"];
+  for(let i=0;i<3;i++){
+    const f=document.createElement('figure'); const src=CONFIG.photos[i];
+    f.innerHTML=(src?`<img src="${src}" alt="Us" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'♥'}))">`:`<div class="ph">♥</div>`)+`<figcaption>${caps[i]}</figcaption>`;
+    $('gallery').appendChild(f);
+  }
+  const pv=document.createElement('figure'); pv.className='priv'; pv.id='priv';
+  pv.innerHTML='<div class="ph" id="pvimg">♥</div><div class="badge">🔒<small>Private · tap to unlock</small></div><figcaption>Just for you</figcaption>';
+  pv.onclick=()=>{ if(!pv.classList.contains('open')) openLock(); };
+  $('gallery').appendChild(pv);
+})();
+
+// Counter
+const start = new Date(CONFIG.startDate).getTime();
+function tick(){
+  let t = Math.max(0, Date.now() - start);
+  $('d').textContent = Math.floor(t/864e5);
+  $('h').textContent = Math.floor(t/36e5)%24;
+  $('m').textContent = Math.floor(t/6e4)%60;
+  $('s').textContent = Math.floor(t/1e3)%60;
+}
+tick(); setInterval(tick,1000);
+
+// Timeline
+CONFIG.story.forEach(e=>{
+  const d = document.createElement('div');
+  d.className='event';
+  d.innerHTML = `<small>${e.date}</small><h3>${e.title}</h3><p>${e.text}</p>`;
+  $('timeline').appendChild(d);
+});
+const io = new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting)x.target.classList.add('show')}),{threshold:.3});
+document.querySelectorAll('.event').forEach(e=>io.observe(e));
+
+// Typewriter letter
+let typed=false;
+new IntersectionObserver((es,ob)=>{
+  if(es[0].isIntersecting && !typed){
+    typed=true; let i=0;
+    const iv=setInterval(()=>{ $('letter').textContent = CONFIG.letter.slice(0,++i); if(i>=CONFIG.letter.length) clearInterval(iv); },35);
+  }
+},{threshold:.4}).observe($('letter'));
+
+// The question: "No" runs away
+const no=$('no');
+function dodge(){
+  const row=$('row').getBoundingClientRect();
+  no.style.position='relative';
+  no.style.left=(Math.random()*160-80)+'px';
+  no.style.top=(Math.random()*80-40)+'px';
+}
+no.addEventListener('mouseover',dodge);
+no.addEventListener('touchstart',e=>{e.preventDefault();dodge()},{passive:false});
+no.addEventListener('click',dodge);
+$('yes').onclick=()=>{ $('answer').textContent=CONFIG.yesMessage; for(let i=0;i<60;i++) spawn(innerWidth/2,innerHeight/2,true); };
+
+// Theme toggle
+$('theme').onclick=()=>{
+  const dark = document.documentElement.dataset.theme==='dark' ||
+    (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme:dark)').matches);
+  document.documentElement.dataset.theme = dark?'light':'dark';
+  $('theme').textContent = dark?'🌙':'☀️';
+};
+
+// Floating hearts
+const cv=$('fx'), ctx=cv.getContext('2d'); let hearts=[];
+function size(){cv.width=innerWidth;cv.height=innerHeight}
+addEventListener('resize',size); size();
+function spawn(x,y,burst){
+  hearts.push({x:x??Math.random()*cv.width,y:y??cv.height+20,s:8+Math.random()*16,
+    vy:burst?-(1+Math.random()*4):-(.4+Math.random()*1),vx:burst?(Math.random()-.5)*6:(Math.random()-.5)*.6,
+    a:1,c:['#e63e6d','#ff9bb3','#ff6f91','#ffc2d1'][Math.floor(Math.random()*4)]});
+}
+function draw(h){
+  ctx.globalAlpha=h.a; ctx.fillStyle=h.c; ctx.font=h.s+'px serif'; ctx.fillText('♥',h.x,h.y);
+}
+setInterval(()=>spawn(),500);
+addEventListener('click',e=>{for(let i=0;i<5;i++)spawn(e.clientX,e.clientY,true)});
+(function loop(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  hearts=hearts.filter(h=>h.a>0&&h.y>-30);
+  hearts.forEach(h=>{h.x+=h.vx;h.y+=h.vy;h.a-=.003;draw(h)});
+  requestAnimationFrame(loop);
+})();
+
+// ===== PIN LOCK =====
+const PIN_HASH="b278d52bfa3225e70001ea4bd9a9070f933b42a5f8153c17890320372210d4aa";
+let entered="";
+const pad=$('pad');
+["1","2","3","4","5","6","7","8","9","","0","⌫"].forEach(k=>{
+  const b=document.createElement('button');
+  if(!k){b.style.visibility='hidden';}
+  b.textContent=k;
+  b.onclick=()=>press(k);
+  pad.appendChild(b);
+});
+function paint(){[...$('dots').children].forEach((d,i)=>d.classList.toggle('on',i<entered.length));}
+function openLock(){entered="";paint();$('hint').textContent="Enter our secret PIN";$('lock').classList.add('open');}
+$('close').onclick=()=>$('lock').classList.remove('open');
+async function sha(t){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function press(k){
+  if(k==="⌫"){entered=entered.slice(0,-1);paint();return;}
+  if(entered.length>=4)return;
+  entered+=k;paint();
+  if(entered.length===4){
+    if(await sha(entered)===PIN_HASH){
+      $('lock').classList.remove('open'); entered=""; paint();
+      $('priv').classList.add('open');
+      if(CONFIG.lockPhoto) $('pvimg').outerHTML='<img id="pvimg" src="'+CONFIG.lockPhoto+'" alt="Private" '+`onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'♥'}))"`+'>';
+      for(let i=0;i<40;i++)spawn(innerWidth/2,innerHeight/2,true);
+    }else{
+      $('dots').classList.add('shake');$('hint').textContent="Wrong PIN, try again 💔";
+      setTimeout(()=>{$('dots').classList.remove('shake');entered="";paint();},450);
+    }
+  }
+}
+addEventListener('keydown',e=>{
+  if(!$('lock').classList.contains('open'))return;
+  if(/^\d$/.test(e.key))press(e.key);else if(e.key==="Backspace")press("⌫");
+});
+</script>
+</body>
+</html>
